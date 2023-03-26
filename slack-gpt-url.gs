@@ -1,3 +1,22 @@
+function test(){
+    slackNotify('test');
+
+}
+function doPost(e){
+  slackNotify('test');
+  const params = JSON.parse(e.postData.getDataAsString());
+
+  if(params.type == "url_verification"){
+    return ContentService.createTextOutput(params.challenge);
+  }
+  return ContentService.createTextOutput("xyz");
+}
+
+function doGet(e){
+  doPost(e);
+}
+
+
 function extractMainContent(html) {
     const $ = Cheerio.load(html);
 
@@ -75,10 +94,31 @@ function generateSummary(url) {
   }
 }
 
-function doPost(e) {
-  const url = e.parameter.text;
-  makeTrigger(url);
-  return ContentService.createTextOutput(preReplyWords(url));
+function doPostx(e) {
+  slackNotify('test');
+  const params = JSON.parse(e.postData.getDataAsString());
+
+  if(params.type == "url_verification"){
+    return ContentService.createTextOutput(params.challenge);
+  }
+      return ContentService.createTextOutput("test");
+
+  if(params.token != slackToken){
+    return ContentService.createTextOutput("invalid token");
+  }
+  if(params.event.subtype && params.event.subtype === 'bot_message') {
+    return null;
+  }
+  const url = params.event.text;
+
+  if(! url.startswith("http")){
+    return ContentService.createTextOutput("not a URL");
+  }
+
+  slackNotify('test');
+  
+  //makeTrigger(url);
+  //return ContentService.createTextOutput(preReplyWords(url));
 }
 
 function makeTrigger(url) {
